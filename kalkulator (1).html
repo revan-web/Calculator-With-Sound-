@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Kalkulator Sederhana</title>
+    <style>
+      *,
+      html {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", sans-serif;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-image: url(http://www.pixelstalk.net/wp-content/uploads/2016/05/Math-Mathematics-Formula-Wallpaper-for-PC.jpg);
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        color: white;
+      }
+
+      .calculator-container {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+      }
+
+      .calculator {
+        width: 280px;
+        padding: 20px;
+        border-radius: 15px;
+        background: #111;
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        margin-bottom: 20px;
+      }
+
+      .display {
+        width: 100%;
+        height: 50px;
+        margin-bottom: 15px;
+        text-align: right;
+        padding: 10px;
+        font-size: 22px;
+        background: #000;
+        border: none;
+        color: #0ff;
+        outline: none;
+        box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.3);
+        border-radius: 8px;
+      }
+
+      .buttons {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-gap: 8px;
+      }
+
+      .button {
+        padding: 15px;
+        font-size: 18px;
+        text-align: center;
+        cursor: pointer;
+        border-radius: 8px;
+        background-color: #111;
+        color: white;
+        border: 1px solid #0ff;
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        transition: all 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .button:hover {
+        background-color: #0ff;
+        color: #000;
+        box-shadow: 0 0 20px #0ff;
+        transform: translateY(-4px) scale(1.05);
+      }
+
+      .operator {
+        color: #ff0;
+        border-color: #ff0;
+        box-shadow: 0 0 10px rgba(255, 255, 0, 0.3);
+      }
+
+      .equal {
+        background-color: #0f0;
+        border-color: #0f0;
+        color: #000;
+        font-weight: bold;
+      }
+
+      .clear {
+        grid-column: span 4;
+        background-color: #f00;
+        border-color: #f00;
+      }
+
+      .title {
+        text-align: center;
+        font-size: 2em;
+        font-weight: bold;
+        background: linear-gradient(
+          90deg,
+          red,
+          orange,
+          yellow,
+          green,
+          cyan,
+          blue,
+          violet,
+          red
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-size: 400%;
+        animation: rgbflow 6s linear infinite;
+        margin-bottom: 15px;
+      }
+
+      @keyframes rgbflow {
+        from {
+          background-position: 0%;
+        }
+        to {
+          background-position: 100%;
+        }
+      }
+
+      .button:active {
+        transform: translateY(2px) scale(0.98);
+      }
+
+      .history {
+        width: 220px;
+        max-height: 320px;
+        overflow-y: auto;
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 10px;
+        padding: 10px;
+        box-shadow: 0 0 10px cyan;
+        display: none;
+      }
+
+      .history h3 {
+        margin-top: 0;
+        text-align: center;
+        color: cyan;
+      }
+
+      .history ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .history li {
+        margin: 5px 0;
+        font-size: 14px;
+        color: #0ff;
+      }
+
+      select,
+      input[type="color"],
+      button.reset-bg,
+      button.music-btn {
+        margin-top: 10px;
+        padding: 8px 15px;
+        border-radius: 8px;
+        border: none;
+        outline: none;
+        background: #000;
+        color: #0ff;
+        box-shadow: 0 0 10px cyan;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
+      .music-btn:hover,
+      .history-toggle:hover {
+        background: cyan;
+        color: black;
+        transform: scale(1.05);
+      }
+
+      .button .num {
+        font-size: 22px;
+        font-weight: bold;
+      }
+
+      .button .name {
+        font-size: 10px;
+        opacity: 0.7;
+        margin-top: 3px;
+      }
+
+      .history-toggle {
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="title">Kalkulator Punya Epan</h1>
+
+    <!-- Tombol Pemutar Lagu -->
+    <button class="music-btn" onclick="toggleMusic()">🎵 Play / Pause Lagu</button>
+
+    <!-- Picker Warna Background + Reset -->
+    <label for="bgColor">Pilih Warna Background: </label>
+    <input type="color" id="bgColor" value="#000000" />
+    <button class="reset-bg" onclick="resetBackground()">
+      Reset Background
+    </button>
+
+    <div class="calculator-container">
+      <div class="calculator">
+        <input type="text" class="display" id="display" disabled />
+        <div class="buttons">
+          <div class="button" onclick="appendToDisplay('7')">
+            <span class="num">7</span><span class="name">SEVEN</span>
+          </div>
+          <div class="button" onclick="appendToDisplay('8')">
+            <span class="num">8</span><span class="name">EIGHT</span>
+          </div>
+          <div class="button" onclick="appendToDisplay('9')">
+            <span class="num">9</span><span class="name">NINE</span>
+          </div>
+          <div class="button operator" onclick="appendToDisplay('/')">÷</div>
+
+          <div class="button" onclick="appendToDisplay('4')">
+            <span class="num">4</span><span class="name">FOUR</span>
+          </div>
+          <div class="button" onclick="appendToDisplay('5')">
+            <span class="num">5</span><span class="name">FIVE</span>
+          </div>
+          <div class="button" onclick="appendToDisplay('6')">
+            <span class="num">6</span><span class="name">SIX</span>
+          </div>
+          <div class="button operator" onclick="appendToDisplay('*')">×</div>
+
+          <div class="button" onclick="appendToDisplay('1')">
+            <span class="num">1</span><span class="name">ONE</span>
+          </div>
+          <div class="button" onclick="appendToDisplay('2')">
+            <span class="num">2</span><span class="name">TWO</span>
+          </div>
+          <div class="button" onclick="appendToDisplay('3')">
+            <span class="num">3</span><span class="name">THREE</span>
+          </div>
+          <div class="button operator" onclick="appendToDisplay('-')">−</div>
+
+          <div class="button" onclick="appendToDisplay('0')">
+            <span class="num">0</span><span class="name">ZERO</span>
+          </div>
+          <div class="button" onclick="appendToDisplay('.')">.</div>
+          <div class="button equal" onclick="calculate()">=</div>
+          <div class="button operator" onclick="appendToDisplay('+')">+</div>
+
+          <div class="button clear" onclick="clearDisplay()">C</div>
+        </div>
+
+        <select id="currency">
+          <option value="none">Tanpa Konversi</option>
+          <option value="usdToIdr">USD ➝ IDR</option>
+          <option value="idrToUsd">IDR ➝ USD</option>
+          <option value="eurToIdr">EUR ➝ IDR</option>
+          <option value="idrToEur">IDR ➝ EUR</option>
+          <option value="jpyToIdr">JPY ➝ IDR</option>
+          <option value="idrToJpy">IDR ➝ JPY</option>
+          <option value="gbpToIdr">GBP ➝ IDR</option>
+          <option value="idrToGbp">IDR ➝ GBP</option>
+        </select>
+        <button class="history-toggle" onclick="toggleHistory()">
+          History
+        </button>
+      </div>
+
+      <div class="history" id="historyBox">
+        <h3>Riwayat</h3>
+        <ul id="historyList"></ul>
+      </div>
+    </div>
+
+    <script>
+  const display = document.getElementById("display");
+  const historyList = document.getElementById("historyList");
+  const currencySelect = document.getElementById("currency");
+  const historyBox = document.getElementById("historyBox");
+  const bgColorPicker = document.getElementById("bgColor");
+  const history = [];
+
+  const defaultBackground =
+    "url(http://www.pixelstalk.net/wp-content/uploads/2016/05/Math-Mathematics-Formula-Wallpaper-for-PC.jpg)";
+
+  // 🎵 Pemutar Lagu
+  let music = new Audio("lagu.mp3");
+  music.loop = true;
+
+  function toggleMusic() {
+    if (music.paused) {
+      music.play();
+    } else {
+      music.pause();
+    }
+  }
+
+  // 🔊 Suara angka
+  function playSound(num) {
+    let audio = new Audio(num + ".mp3"); // contoh: 1.mp3, 2.mp3
+    audio.play().catch((err) => console.log("Sound error:", err));
+  }
+
+  // 🔊 Suara operator
+  function playOperatorSound(op) {
+    let file = "";
+    switch (op) {
+      case "+": file = "plus.mp3"; break;
+      case "-": file = "minus.mp3"; break;
+      case "*": file = "times.mp3"; break;
+      case "/": file = "divide.mp3"; break;
+    }
+    if (file) {
+      let audio = new Audio(file);
+      audio.play().catch((err) => console.log("Sound error:", err));
+    }
+  }
+
+  // 🔊 Efek suara hasil (mp3)
+  function playResultSound() {
+    let audio = new Audio("result.mp3");
+    audio.play().catch((err) => console.log("Sound error:", err));
+  }
+
+  // 🔊 Text-to-Speech untuk hasil (bahasa Indonesia)
+  function speakResult(text) {
+    if (!("speechSynthesis" in window)) return;
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = "id-ID";
+    utter.rate = 1;
+    speechSynthesis.speak(utter);
+  }
+
+  // ➕ Tambah ke display
+  function appendToDisplay(value) {
+    display.value += value;
+    if (!isNaN(value)) {
+      playSound(value); // angka → suara file mp3
+    } else {
+      playOperatorSound(value); // operator → suara file mp3
+    }
+  }
+
+  // ❌ Clear
+  function clearDisplay() {
+    display.value = "";
+  }
+
+  // ✅ Hitung hasil
+  function calculate() {
+    try {
+      let result = eval(display.value);
+      if (isNaN(result)) throw Error();
+
+      const currency = currencySelect.value;
+      let converted = result;
+      let label = "";
+
+      switch (currency) {
+        case "usdToIdr": converted = result * 15500; label = " IDR"; break;
+        case "idrToUsd": converted = result / 15500; label = " USD"; break;
+        case "eurToIdr": converted = result * 17000; label = " IDR"; break;
+        case "idrToEur": converted = result / 17000; label = " EUR"; break;
+        case "jpyToIdr": converted = result * 110; label = " IDR"; break;
+        case "idrToJpy": converted = result / 110; label = " JPY"; break;
+        case "gbpToIdr": converted = result * 19500; label = " IDR"; break;
+        case "idrToGbp": converted = result / 19500; label = " GBP"; break;
+        default: label = "";
+      }
+
+      display.value = converted + label;
+
+      history.push(display.value);
+      updateHistory();
+
+      // 🔊 mainkan suara hasil
+      playResultSound();
+      // 🔊 bacakan hasil (bahasa Indonesia, otomatis)
+      setTimeout(() => {
+      speakResult(display.value);
+    }, 900);
+
+    } catch {
+      display.value = "Error";
+    }
+  }
+
+  // 📜 Update history
+  function updateHistory() {
+    historyList.innerHTML = "";
+    history.slice(-10).forEach((item) => {
+      const li = document.createElement("li");
+      li.textContent = item;
+      historyList.appendChild(li);
+    });
+  }
+
+  // 📜 Toggle history box
+  function toggleHistory() {
+    if (historyBox.style.display === "none" || historyBox.style.display === "") {
+      historyBox.style.display = "block";
+    } else {
+      historyBox.style.display = "none";
+    }
+  }
+
+  // 🎨 Ganti warna background
+  bgColorPicker.addEventListener("input", (e) => {
+    document.body.style.background = e.target.value;
+  });
+
+  // 🔄 Reset background ke default
+  function resetBackground() {
+    document.body.style.backgroundImage = defaultBackground;
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+    document.body.style.backgroundAttachment = "fixed";
+  }
+</script>
+    </body>
+</html>
